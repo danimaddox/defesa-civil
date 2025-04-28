@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro no Supabase</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h2>Cadastro de Dados</h2>
+    <form id="dataForm">
+        <label for="sigrc">SIGRC:</label>
+        <input type="number" id="sigrc" name="sigrc" required>
+        
+        <label for="endereco">Endereço:</label>
+        <input type="text" id="endereco" name="endereco" required>
+        
+        <label for="numeral">Numeral:</label>
+        <input type="number" id="numeral" name="numeral" required>
+        
+        <label for="bairro">Bairro:</label>
+        <input type="text" id="bairro" name="bairro" required>
+        
+        <label for="distrito">Distrito:</label>
+        <input type="text" id="distrito" name="distrito" required>
+        
+        <label for="risco">Risco (0-4):</label>
+        <input type="number" id="risco" name="risco" min="0" max="4" required>
+        
+        <label for="motivo">Motivo:</label>
+        <input type="text" id="motivo" name="motivo" required>
+        
+        <label for="data">Data:</label>
+        <input type="date" id="data" name="data" required>
+        
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script>
+        document.getElementById('dataForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            
+            const response = await fetch('http://localhost:5000/insert', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            alert(result.message);
+        });
+    </script>
+</body>
+</html>
