@@ -1,78 +1,43 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Ocorrências - Defesa Civil</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-</head>
-<body>
-    <h2>Cadastro de Ocorrências</h2>
-    <form id="dataForm">
-        <label for="sigrc">SIGRC:</label>
-        <input type="number" id="sigrc" name="sigrc" required>
+<script>
+    const supabaseUrl = "https://drfclkhcuewmxbryuyhp.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyZmNsa2hjdWV3bXhicnl1eWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU4NDc0MTQsImV4cCI6MjA2MTQyMzQxNH0.-AuaTfmpXRJ3nH70q9L0Z3Q50kaJJPMsrNms7cW-Ao8";
 
-        <label for="endereco">Endereço:</label>
-        <input type="text" id="endereco" name="endereco" required>
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        <label for="numeral">Numeral:</label>
-        <input type="number" id="numeral" name="numeral" required>
+    document.getElementById('dataForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
 
-        <label for="bairro">Bairro:</label>
-        <input type="text" id="bairro" name="bairro" required>
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
 
-        <label for="distrito">Distrito:</label>
-        <input type="text" id="distrito" name="distrito" required>
+        // Conversão segura
+        data.sigrc = Number(data.sigrc);
+        data.numeral = Number(data.numeral);
+        data.risco = Number(data.risco);
 
-        <label for="risco">Risco (0-4):</label>
-        <input type="number" id="risco" name="risco" min="0" max="4" required>
+        if (isNaN(data.sigrc) || isNaN(data.numeral) || isNaN(data.risco)) {
+            alert('Erro: SIGRC, Numeral e Risco devem ser números válidos.');
+            return;
+        }
 
-        <label for="motivo">Motivo:</label>
-        <input type="text" id="motivo" name="motivo" required>
+        try {
+            console.log("➡️ Enviando dados para Supabase:", data);
 
-        <label for="data">Data:</label>
-        <input type="date" id="data" name="data" required>
-
-        <button type="submit">Enviar</button>
-    </form>
-
-    <script>
-        // ====> INSIRA AQUI SUA URL DO SUPABASE
-        const supabaseUrl = "https://drfclkhcuewmxbryuyhp.supabase.co";
-
-        // ====> INSIRA AQUI SUA CHAVE PUBLICA (ANON KEY)
-        const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyZmNsa2hjdWV3bXhicnl1eWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU4NDc0MTQsImV4cCI6MjA2MTQyMzQxNH0.-AuaTfmpXRJ3nH70q9L0Z3Q50kaJJPMsrNms7cW-Ao8";
-
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-        document.getElementById('dataForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
-
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-
-            // Conversão segura para inteiros
-            data.sigrc = Number(data.sigrc);
-            data.numeral = Number(data.numeral);
-            data.risco = Number(data.risco);
-
-            if (isNaN(data.sigrc) || isNaN(data.numeral) || isNaN(data.risco)) {
-                alert('Erro: SIGRC, Numeral e Risco devem ser números válidos.');
-                return;
-            }
-
-            const { error } = await supabase
+            const { data: insertResult, error } = await supabase
                 .from('tabela_unica')
                 .insert([data]);
 
             if (error) {
-                alert('Erro ao enviar dados: ' + error.message);
+                console.error("❌ Erro na inserção:", error);
+                alert("Erro ao enviar dados: " + error.message);
             } else {
-                alert('✅ Dados enviados com sucesso!');
+                console.log("✅ Dados inseridos:", insertResult);
+                alert("✅ Dados enviados com sucesso!");
                 this.reset();
             }
-        });
-    </script>
-</body>
-</html>
+        } catch (err) {
+            console.error("❌ Erro inesperado:", err);
+            alert("Erro inesperado: " + err.message);
+        }
+    });
+</script>
